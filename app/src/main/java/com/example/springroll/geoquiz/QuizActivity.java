@@ -1,10 +1,12 @@
 package com.example.springroll.geoquiz;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,8 +15,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class QuizActivity extends AppCompatActivity {
-
-    private Button mTrueButton, mFalseButon, mNextbutton;
+    private static final String KEY_INDEX = "index";
+    private static final String TAG = "QuizActivity";
+    private Button mTrueButton, mFalseButon, mNextbutton, mCheatbutton;
     private TextView mTextView;
     private int mCurrent = 0;
 
@@ -42,6 +45,7 @@ public class QuizActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate() called");
         setContentView(R.layout.activity_quiz);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -73,7 +77,28 @@ public class QuizActivity extends AppCompatActivity {
             }
         });
 
+        mCheatbutton = (Button)findViewById(R.id.cheat_Button);
+        mCheatbutton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Intent i = new Intent(QuizActivity.this, CheatActivity.class);
+                boolean answerIsTrue = mBank[mCurrent].isTrueQuestion();
+                i.putExtra(CheatActivity.EXTRA_ANSWER_IS_TRUE,answerIsTrue);
+                startActivity(i);
+            }
+        });
+
+        if (savedInstanceState != null){
+            mCurrent = savedInstanceState.getInt(KEY_INDEX,0);
+        }
         update();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState){
+        super.onSaveInstanceState(savedInstanceState);
+        Log.i(TAG, "onSaveInstanceState");
+        savedInstanceState.putInt(KEY_INDEX, mCurrent);
     }
 
     @Override
